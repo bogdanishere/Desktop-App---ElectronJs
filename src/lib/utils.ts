@@ -1,7 +1,4 @@
-export type MessageDeepseek = {
-  role: "user" | "system" | "assistant";
-  content: string;
-};
+import type { MessageDeepseek } from "./types";
 
 export async function chatWithDeepseek(
   messages: MessageDeepseek[]

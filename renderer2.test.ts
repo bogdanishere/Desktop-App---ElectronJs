@@ -1,258 +1,224 @@
-type MessageDeepseek = {
-  role: "user" | "system" | "assistant";
-  content: string;
-};
+// import { chatWithDeepseek } from "./lib/utils";
+// import type { MessageDeepseek } from "./lib/types";
+// import { parseAll } from "./lib/parseAll";
 
-/**
- * Apelează API-ul Ollama cu mesajele curente
- * și întoarce un nou array de mesaje cu răspunsul asistentului.
- */
-async function chatWithDeepseek(
-  messages: MessageDeepseek[]
-): Promise<MessageDeepseek[]> {
-  const { default: ollama } = await import("ollama");
+// const body = document.querySelector("body");
 
-  const response = await ollama.chat({
-    model: "deepseek-r1:8b",
-    messages: messages,
-  });
+// if (!body) {
+//   throw new Error("Nu a fost găsit <body> în document.");
+// }
 
-  const newMessage = [
-    ...messages,
-    { role: "assistant", content: response.message.content } as const,
-  ];
+// const header = document.createElement("h1");
+// header.innerText = "Welcome to Deepseek Chat";
+// header.style.textAlign = "center";
 
-  return newMessage;
-}
+// let messages: MessageDeepseek[] = [];
+// let loading = false;
 
-/**
- * Definim un tip pentru fragment (text sau bloc de cod).
- */
-type Fragment = {
-  type: "text" | "code";
-  language?: string; // ex: "jsx", "ts", etc.
-  content: string;
-};
+// const form = document.createElement("form");
+// form.style.display = "flex";
+// form.style.justifyContent = "space-between";
+// form.style.alignItems = "center";
+// form.style.marginTop = "1rem";
+// form.style.width = "100%";
+// form.style.margin = "auto";
+// form.style.gap = "45px";
+// form.onsubmit = (event) => event.preventDefault();
 
-/**
- * Funcție care caută în string fragmentele de tip ```lang\n ... \n```
- * și le returnează ca array de Fragmente (text sau cod).
- */
-function parseCodeBlocks(content: string): Fragment[] {
-  // Regex care prinde: ```urmat de (limba, ex: jsx), newline,
-  // conținut multiline până la următorul ```
-  const codeBlockRegex = /```(\w*)\n([\s\S]*?)```/g;
-  let lastIndex = 0;
-  const fragments: Fragment[] = [];
-  let match: RegExpExecArray | null;
+// const input = document.createElement("input");
+// input.type = "text";
+// input.placeholder = "Type here";
+// input.style.flexGrow = "1";
 
-  while ((match = codeBlockRegex.exec(content)) !== null) {
-    // match.index -> poziția din string unde a început match-ul
-    if (match.index > lastIndex) {
-      // Adăugăm textul de dinaintea blocului de cod
-      fragments.push({
-        type: "text",
-        content: content.slice(lastIndex, match.index),
-      });
-    }
+// const button = document.createElement("button");
+// button.innerText = "Send";
+// button.type = "button";
+// button.onclick = () => handleButtonAction();
 
-    // match[1] este limba (ex: "jsx")
-    // match[2] este conținutul blocului de cod
-    fragments.push({
-      type: "code",
-      language: match[1],
-      content: match[2],
-    });
+// const showMessages = document.createElement("div");
+// showMessages.style.height = "800px";
+// showMessages.style.overflow = "auto";
+// showMessages.style.border = "1px solid #ccc";
+// showMessages.style.marginTop = "1rem";
+// showMessages.style.padding = "0.5rem";
 
-    // actualizăm lastIndex la finalul blocului
-    lastIndex = codeBlockRegex.lastIndex;
-  }
+// // append all elements to the body
 
-  // Dacă a mai rămas text după ultimul bloc de cod
-  if (lastIndex < content.length) {
-    fragments.push({
-      type: "text",
-      content: content.slice(lastIndex),
-    });
-  }
+// form.appendChild(input);
+// form.appendChild(button);
 
-  return fragments;
-}
+// body.appendChild(header);
+// body.appendChild(form);
+// body.appendChild(showMessages);
 
-// ------------------------------------------------
-// Inițializăm elementele din DOM
+// body.addEventListener("keyup", (event) => {
+//   if (event.key === "Enter") {
+//     handleButtonAction();
+//   }
+// });
 
-const body = document.querySelector("body");
-if (!body) {
-  throw new Error("Nu a fost găsit <body> în document.");
-}
+// /////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////
+// ///////////// FUNCTIONS ////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////
+// /////////////////////////////////////////////////////////////////////////
 
-const header = document.createElement("h1");
-header.innerText = "Welcome to Deepseek Chat";
+// function renderMessages(): void {
+//   showMessages.innerHTML = "";
 
-let messages: MessageDeepseek[] = [];
-let loading = false;
+//   messages.forEach((message) => {
+//     // Containerul întregului mesaj (toate fragmentele + titlul de rol)
+//     const messageContainer = document.createElement("div");
+//     messageContainer.style.marginBottom = "0.5rem";
 
-const form = document.createElement("form");
-form.style.display = "flex";
-form.style.justifyContent = "space-between";
-form.style.alignItems = "center";
-form.style.marginTop = "1rem";
-form.style.width = "100%";
-form.style.maxWidth = "800px";
-form.style.margin = "auto";
-form.style.gap = "45px";
-form.onsubmit = (event) => event.preventDefault();
+//     // Creăm titlul cu rolul expeditorului
+//     const roleLabel = document.createElement("div");
+//     roleLabel.textContent = message.role.toUpperCase();
+//     roleLabel.style.fontWeight = "bold";
+//     roleLabel.style.marginBottom = "0.3rem";
 
-const input = document.createElement("input");
-input.type = "text";
-input.placeholder = "Type here";
-input.style.flexGrow = "1";
+//     // În funcție de rol se aplică stilurile de aliniere și culoare
+//     if (message.role === "user") {
+//       roleLabel.style.textAlign = "right";
+//       roleLabel.style.color = "green";
+//     } else {
+//       roleLabel.style.textAlign = "left";
+//       roleLabel.style.color = "blue";
+//     }
 
-const button = document.createElement("button");
-button.innerText = "Send";
-button.type = "button";
+//     // Adăugăm titlul în containerul mesajului
+//     messageContainer.appendChild(roleLabel);
 
-const showMessages = document.createElement("div");
-showMessages.style.height = "800px";
-showMessages.style.overflow = "auto";
-showMessages.style.border = "1px solid #ccc";
-showMessages.style.marginTop = "1rem";
-showMessages.style.padding = "0.5rem";
+//     // Se obțin fragmentele din conținut (text, code, think)
+//     const fragments = parseAll(message.content);
 
-/**
- * Afișează toate mesajele din array-ul `messages`,
- * separând textul simplu de blocurile de cod și
- * stilizându-le diferit.
- */
-function renderMessages(): void {
-  showMessages.innerHTML = "";
+//     // Pentru fiecare fragment se creează un container separat
+//     fragments.forEach((fragment) => {
+//       // Dacă fragmentul de tip think este gol, nu-l afișăm
+//       if (fragment.type === "think" && fragment.content.trim().length === 0) {
+//         return;
+//       }
 
-  messages.forEach((message) => {
-    // Pentru fiecare mesaj, despărțim conținutul în fragmente
-    const fragments = parseCodeBlocks(message.content);
+//       const wrapper = document.createElement("div");
+//       // Setăm aceeași aliniere și culoare ca la titlu
+//       if (message.role === "user") {
+//         wrapper.style.textAlign = "right";
+//         wrapper.style.color = "green";
+//       } else {
+//         wrapper.style.textAlign = "left";
+//         wrapper.style.color = "blue";
+//       }
+//       wrapper.style.margin = "0.2rem 0";
 
-    fragments.forEach((fragment) => {
-      // Pentru a controla alinierea și culoarea,
-      // creăm un wrapper general (ex: <div>)
-      const wrapper = document.createElement("div");
+//       switch (fragment.type) {
+//         case "text": {
+//           wrapper.innerHTML = fragment.content;
+//           break;
+//         }
 
-      // În funcție de tipul fragmentului (text / cod), punem alt HTML
-      if (fragment.type === "text") {
-        // Text obișnuit
-        wrapper.innerText = fragment.content;
-      } else if (fragment.type === "code") {
-        // Creăm un <pre><code> pentru cod + un buton de copiere
-        const pre = document.createElement("pre");
-        const code = document.createElement("code");
-        const copyBtn = document.createElement("button");
+//         case "code": {
+//           const copyBtn = document.createElement("button");
+//           copyBtn.innerText = "Copy code";
+//           copyBtn.style.position = "absolute";
+//           copyBtn.style.top = "6px"; // Reduce distanța față de top
+//           copyBtn.style.right = "6px"; // Reduce distanța față de marginea dreaptă
+//           copyBtn.style.padding = "4px 8px"; // Ajustează paddingul butonului
+//           copyBtn.style.fontSize = "12px"; // Reduce dimensiunea fontului pentru a se potrivi mai bine
+//           copyBtn.style.background = "green";
+//           copyBtn.style.color = "white";
+//           copyBtn.style.border = "none";
+//           copyBtn.style.borderRadius = "5px";
+//           copyBtn.style.cursor = "pointer";
+//           copyBtn.style.zIndex = "2"; // Asigură că butonul este deasupra codului
 
-        // Butonul de copiere
-        copyBtn.innerText = "Copiază codul";
-        copyBtn.style.marginBottom = "4px";
-        copyBtn.onclick = () => {
-          navigator.clipboard.writeText(fragment.content);
-        };
+//           copyBtn.onclick = () => {
+//             navigator.clipboard.writeText(fragment.content);
+//             copyBtn.innerText = "Copied!";
+//           };
 
-        // Stil pentru <code> (border, background, culoare text)
-        code.style.display = "block";
-        code.style.border = "1px solid black";
-        code.style.background = "#f9f9f9";
-        code.style.color = "black";
-        code.style.padding = "8px";
-        code.style.whiteSpace = "pre-wrap"; // să nu iasă din container
+//           const pre = document.createElement("pre");
+//           pre.style.position = "relative";
+//           pre.style.margin = "0 1rem";
+//           pre.style.paddingTop = "0.5rem"; // Menține un spațiu mic pentru buton
+//           pre.style.background = "#f9f9f9"; // Fundal mai prietenos pentru cod
+//           pre.style.border = "1px solid black";
+//           pre.style.borderRadius = "5px";
+//           pre.style.overflow = "auto"; // Scroll pentru cod lung
 
-        // Setăm textul codului în <code>
-        code.textContent = fragment.content;
+//           const code = document.createElement("code");
+//           code.style.display = "block";
+//           code.style.padding = "8px";
+//           code.style.whiteSpace = "pre-wrap";
+//           code.textContent = fragment.content;
 
-        // Adăugăm ordinea: buton -> <pre><code>
-        pre.appendChild(code);
+//           pre.appendChild(copyBtn);
+//           pre.appendChild(code);
+//           wrapper.appendChild(pre);
+//           break;
+//         }
 
-        // Afișarea finală în wrapper
-        wrapper.appendChild(copyBtn);
-        wrapper.appendChild(pre);
-      }
+//         case "think": {
+//           const thinkContainer = document.createElement("div");
+//           thinkContainer.style.border = "1px solid #8f008f";
+//           thinkContainer.style.padding = "6px";
+//           thinkContainer.style.background = "rgb(73, 148, 167)";
+//           thinkContainer.style.color = "black";
 
-      // Stilul diferă în funcție de rol
-      if (message.role === "user") {
-        wrapper.style.textAlign = "right";
-        wrapper.style.color = "green";
-      } else {
-        // system sau assistant
-        wrapper.style.textAlign = "left";
-        wrapper.style.color = "blue";
-      }
+//           const h1 = document.createElement("h1");
+//           h1.textContent = "What is the AI thinking?";
+//           h1.style.paddingBottom = "9px";
 
-      wrapper.style.margin = "0.5rem 0";
-      showMessages.appendChild(wrapper);
-    });
-  });
+//           const thinkText = document.createElement("div");
+//           thinkText.textContent = fragment.content;
 
-  // Facem scroll automat la final
-  showMessages.scrollTop = showMessages.scrollHeight;
-}
+//           thinkContainer.appendChild(h1);
+//           thinkContainer.appendChild(thinkText);
 
-/**
- * Actualizează starea butonului „Send” în funcție de `loading`.
- */
-function updateButtonText(): void {
-  button.innerText = loading ? "Loading..." : "Send";
-  button.disabled = loading;
-}
+//           wrapper.appendChild(thinkContainer);
+//           break;
+//         }
+//       }
 
-/**
- * Este apelat când se dă click pe buton (sau Enter).
- * Trimite textul user-ului la API și așteaptă răspuns.
- */
-async function handleButtonAction(): Promise<void> {
-  if (loading) return;
+//       messageContainer.appendChild(wrapper);
+//     });
 
-  const text = input.value.trim();
-  if (!text) return;
+//     showMessages.appendChild(messageContainer);
+//   });
 
-  loading = true;
-  updateButtonText();
+//   // Scroll la finalul zonei de mesaje
+//   showMessages.scrollTop = showMessages.scrollHeight;
+// }
 
-  messages.push({ role: "user", content: text });
-  input.value = "";
+// function updateButtonText() {
+//   button.innerText = loading ? "Loading..." : "Send";
+//   button.disabled = loading;
+// }
 
-  // Reafișăm mesajele cu textul userului
-  renderMessages();
+// async function handleButtonAction(): Promise<void> {
+//   if (loading) return;
 
-  try {
-    // Așteptăm răspunsul de la model
-    const newMessages = await chatWithDeepseek(messages);
-    messages = newMessages;
-  } catch (error) {
-    console.error(error);
-    messages = [...messages, { role: "system", content: "Error occurred" }];
-  } finally {
-    loading = false;
-    updateButtonText();
-  }
+//   const text = input.value.trim();
+//   if (!text) return;
 
-  // Afișăm mesajele (inclusiv ce a generat asistentul)
-  renderMessages();
-}
+//   loading = true;
+//   updateButtonText();
 
-// ------------------------------------------------
-// Legăm totul în pagina HTML
+//   messages.push({ role: "user", content: text });
+//   input.value = "";
 
-form.appendChild(input);
-form.appendChild(button);
+//   renderMessages();
 
-body.appendChild(header);
-body.appendChild(form);
-body.appendChild(showMessages);
+//   try {
+//     const newMessages = await chatWithDeepseek(messages);
+//     messages = newMessages;
+//   } catch (error) {
+//     console.error(error);
+//     messages = [...messages, { role: "system", content: "Error occurred" }];
+//   } finally {
+//     loading = false;
+//     updateButtonText();
+//   }
 
-// Când se apasă Enter pe tastatură, trimitem mesajul
-body.addEventListener("keyup", (event) => {
-  if (event.key === "Enter") {
-    handleButtonAction();
-  }
-});
-
-// Când se apasă pe butonul "Send"
-button.onclick = () => handleButtonAction();
-
-updateButtonText(); // Inițializare buton
+//   renderMessages();
+// }
+// console.log("Hello from renderer.ts");

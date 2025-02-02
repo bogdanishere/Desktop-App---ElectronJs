@@ -1,6 +1,26 @@
+// {
+//   "compilerOptions": {
+//     "target": "es5",
+
+//     "module": "NodeNext",
+
+//     "strict": true,
+
+//     "esModuleInterop": true,
+//     "moduleResolution": "nodenext",
+
+//     "skipLibCheck": true,
+
+//     "forceConsistentCasingInFileNames": true,
+
+//     "outDir": "dist"
+//   }
+// }
+
 {
   "compilerOptions": {
     "module": "CommonJS",
+    "esModuleInterop": true,
     "noImplicitAny": true,
     "sourceMap": true,
     "outDir": "dist",

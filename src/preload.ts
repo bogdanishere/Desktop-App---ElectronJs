@@ -8,10 +8,12 @@ window.addEventListener("DOMContentLoaded", () => {
     }
   };
 
-  for (const type of ["chrome", "node", "electron"]) {
-    replaceText(
-      `${type}-version`,
-      process.versions[type as keyof NodeJS.ProcessVersions]
-    );
-  }
+  // for (const type of ["chrome", "node", "electron"]) {
+  //   replaceText(
+  //     `${type}-version`,
+  //     process.versions[type as keyof NodeJS.ProcessVersions]
+  //   );
+  // }
+
+  // Replace the following code with your own.
 });
