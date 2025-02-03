@@ -54,11 +54,9 @@ input.style.transition = "all 0.3s ease";
 // Add focus effect to input
 input.onfocus = () => {
   input.style.borderColor = "#4a9eff";
-  // input.style.boxShadow = "0 0 0 3px rgba(74, 158, 255, 0.2)";
 };
 input.onblur = () => {
   input.style.borderColor = "#e1e1e1";
-  input.style.boxShadow = "none";
 };
 
 const button = document.createElement("button");
@@ -222,8 +220,6 @@ function renderMessages(): void {
 
             const thinkText = document.createElement("div");
 
-            // thinkText.innerHTML = fragment.content.replace(/\n/g, "<br>");
-            // thinkText.innerHTML = fragment.content;
             thinkText.innerHTML = await parseMarkdown(fragment.content);
             thinkText.style.fontSize = "1rem";
             thinkContainer.appendChild(h1);
