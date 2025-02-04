@@ -40,6 +40,11 @@ ipcMain.handle("chat-deepseek", async (event, args) => {
 git clone https://github.com/bogdanishere/Desktop-App---ElectronJs
 ```
 
+## Install Dependencies
+```bash
+npm install
+```
+
 ## Run the Application
 ```bash
 npm start
