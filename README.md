@@ -40,6 +40,14 @@ ipcMain.handle("chat-deepseek", async (event, args) => {
 git clone https://github.com/bogdanishere/Desktop-App---ElectronJs
 ```
 
+## Node version
+I am using Node.js version 15. Make sure to install it if you don’t have Node on your computer, otherwise, you might encounter issues while running the app.
+
+[🔗 Download Node.js v15](https://nodejs.org/download/release/v15.14.0/)
+
+
+
+
 ## Install Dependencies
 ```bash
 npm install
